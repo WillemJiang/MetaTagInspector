@@ -1,8 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import MetaTagItem from "@/components/meta-tag-item";
-import { AlignJustify, Link2, MessageSquare, Code, MoreHorizontal } from "lucide-react";
+import { 
+  AlignJustify, 
+  Link2, 
+  MessageSquare, 
+  Code, 
+  MoreHorizontal, 
+  Check, 
+  AlertTriangle, 
+  X, 
+  HelpCircle, 
+  Facebook, 
+  Twitter, 
+  Search, 
+  FileJson 
+} from "lucide-react";
 
 interface CategoryTabsProps {
   metaTags: {
@@ -20,6 +35,172 @@ interface MetaTag {
   status: "good" | "warning" | "error";
   type?: string;
   recommendation?: string;
+}
+
+// Helper functions for visual summaries
+function getStatusCounts(tags: MetaTag[]) {
+  return {
+    good: tags.filter(tag => tag.status === "good").length,
+    warning: tags.filter(tag => tag.status === "warning").length,
+    error: tags.filter(tag => tag.status === "error").length
+  };
+}
+
+function getCategoryScore(tags: MetaTag[]) {
+  if (tags.length === 0) return 0;
+  
+  const counts = getStatusCounts(tags);
+  return Math.round((counts.good * 100 + counts.warning * 50) / (tags.length * 100) * 100);
+}
+
+function getHealthStatus(score: number) {
+  if (score >= 80) return { text: "Healthy", color: "text-green-500 dark:text-green-400" };
+  if (score >= 50) return { text: "Needs Attention", color: "text-amber-500 dark:text-amber-400" };
+  return { text: "Critical", color: "text-red-500 dark:text-red-400" };
+}
+
+function getCategoryDescription(category: string) {
+  switch (category) {
+    case "general":
+      return "Basic meta tags that help search engines understand your page content.";
+    case "opengraph":
+      return "Tags that control how your content appears when shared on Facebook and other platforms.";
+    case "twitter":
+      return "Special meta tags for Twitter that control how your content appears when shared.";
+    case "structured":
+      return "JSON-LD structured data helps search engines understand your content's context.";
+    case "other":
+      return "Additional meta tags that may affect your site's appearance or functionality.";
+    default:
+      return "";
+  }
+}
+
+// Visual score circle component
+function ScoreCircle({ score }: { score: number }) {
+  const [animatedScore, setAnimatedScore] = useState(0);
+  
+  useEffect(() => {
+    const duration = 1000;
+    const startTime = performance.now();
+    
+    const animateScore = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      setAnimatedScore(Math.floor(progress * score));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateScore);
+      }
+    };
+    
+    requestAnimationFrame(animateScore);
+  }, [score]);
+  
+  // Calculate the circumference and offset for the SVG circle
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (animatedScore / 100) * circumference;
+  
+  // Determine color based on score
+  let strokeColor = "#ef4444"; // red
+  if (score >= 80) strokeColor = "#10b981"; // green
+  else if (score >= 50) strokeColor = "#f59e0b"; // amber
+  
+  return (
+    <div className="relative w-20 h-20">
+      {/* Background circle */}
+      <svg className="w-full h-full" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          fill="transparent"
+          stroke="#e6e6e6"
+          strokeWidth="8"
+          className="dark:opacity-20"
+        />
+        {/* Progress circle */}
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          fill="transparent"
+          stroke={strokeColor}
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 50 50)"
+          className="transition-all duration-300"
+        />
+      </svg>
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          {animatedScore}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Category summary component
+function CategorySummary({ category, tags }: { category: string, tags: MetaTag[] }) {
+  const score = getCategoryScore(tags);
+  const healthStatus = getHealthStatus(score);
+  const counts = getStatusCounts(tags);
+  
+  // Category icons mapping
+  const getCategoryIcon = () => {
+    switch(category) {
+      case "general": return <Search className="h-5 w-5 text-blue-500" />;
+      case "opengraph": return <Facebook className="h-5 w-5 text-blue-600" />;
+      case "twitter": return <Twitter className="h-5 w-5 text-sky-500" />;
+      case "structured": return <FileJson className="h-5 w-5 text-emerald-500" />;
+      default: return <HelpCircle className="h-5 w-5 text-slate-500" />;
+    }
+  };
+  
+  return (
+    <Card className="p-4 mb-6 border border-slate-200 dark:border-slate-700">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <ScoreCircle score={score} />
+        
+        <div className="flex-1 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              {getCategoryIcon()}
+              <h4 className="text-lg font-semibold text-slate-900 dark:text-white capitalize">
+                {category === "opengraph" ? "Open Graph" : category} Tags
+              </h4>
+            </div>
+            <span className={`text-sm font-medium ${healthStatus.color}`}>
+              {healthStatus.text}
+            </span>
+          </div>
+          
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+            {getCategoryDescription(category)}
+          </p>
+          
+          <div className="flex justify-center sm:justify-start gap-4">
+            <div className="flex items-center gap-1">
+              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-sm">{counts.good}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <span className="text-sm">{counts.warning}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <X className="h-4 w-4 text-red-500" />
+              <span className="text-sm">{counts.error}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
 }
 
 export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
@@ -91,7 +272,7 @@ export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
         </div>
 
         <TabsContent value="general" className="p-3 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-3 sm:mb-4">General Meta Tags</h3>
+          <CategorySummary category="general" tags={metaTags.general} />
           <div className="space-y-3 sm:space-y-4">
             {metaTags.general.length > 0 ? (
               metaTags.general.map((tag) => (
@@ -106,7 +287,7 @@ export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
         </TabsContent>
 
         <TabsContent value="opengraph" className="p-3 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-3 sm:mb-4">Open Graph Meta Tags</h3>
+          <CategorySummary category="opengraph" tags={metaTags.opengraph} />
           <div className="space-y-3 sm:space-y-4">
             {metaTags.opengraph.length > 0 ? (
               metaTags.opengraph.map((tag) => (
@@ -121,7 +302,7 @@ export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
         </TabsContent>
 
         <TabsContent value="twitter" className="p-3 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-3 sm:mb-4">Twitter Card Meta Tags</h3>
+          <CategorySummary category="twitter" tags={metaTags.twitter} />
           <div className="space-y-3 sm:space-y-4">
             {metaTags.twitter.length > 0 ? (
               metaTags.twitter.map((tag) => (
@@ -136,7 +317,7 @@ export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
         </TabsContent>
 
         <TabsContent value="structured" className="p-3 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-3 sm:mb-4">Structured Data</h3>
+          <CategorySummary category="structured" tags={metaTags.structured} />
           <div className="space-y-3 sm:space-y-4">
             {metaTags.structured.length > 0 ? (
               metaTags.structured.map((tag) => (
@@ -151,7 +332,7 @@ export default function CategoryTabs({ metaTags }: CategoryTabsProps) {
         </TabsContent>
 
         <TabsContent value="other" className="p-3 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-3 sm:mb-4">Other Meta Tags</h3>
+          <CategorySummary category="other" tags={metaTags.other} />
           <div className="space-y-3 sm:space-y-4">
             {metaTags.other.length > 0 ? (
               metaTags.other.map((tag) => (

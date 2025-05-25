@@ -8,6 +8,9 @@ import CategoryTabs from "@/components/category-tabs";
 import PreviewSection from "@/components/preview-section";
 import RecommendationsSection from "@/components/recommendations-section";
 import { useToast } from "@/hooks/use-toast";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Lightbulb, Images } from "lucide-react";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -62,12 +65,38 @@ export default function Home() {
             stats={data.stats}
             onReset={resetAnalysis}
           />
-
-          <CategoryTabs metaTags={data.metaTags} />
-
-          <PreviewSection preview={data.preview} />
-
-          <RecommendationsSection recommendations={data.recommendations} />
+          
+          {/* Dashboard Tabs for better visualization */}
+          <Card className="p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+            <Tabs defaultValue="analysis" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-6">
+                <TabsTrigger value="analysis" className="flex items-center gap-2">
+                  <Search className="h-4 w-4" />
+                  <span>SEO Analysis</span>
+                </TabsTrigger>
+                <TabsTrigger value="previews" className="flex items-center gap-2">
+                  <Images className="h-4 w-4" />
+                  <span>Social Previews</span>
+                </TabsTrigger>
+                <TabsTrigger value="recommendations" className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4" />
+                  <span>Recommendations</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="analysis">
+                <CategoryTabs metaTags={data.metaTags} />
+              </TabsContent>
+              
+              <TabsContent value="previews">
+                <PreviewSection preview={data.preview} />
+              </TabsContent>
+              
+              <TabsContent value="recommendations">
+                <RecommendationsSection recommendations={data.recommendations} />
+              </TabsContent>
+            </Tabs>
+          </Card>
         </div>
       )}
     </main>
