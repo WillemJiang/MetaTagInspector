@@ -122,8 +122,8 @@ export default function ResultsSummary({
                     Score
                   </dt>
                   <dd>
-                    <div className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
-                      {calculateScore(stats.implemented, stats.warnings, stats.critical)}/100
+                    <div className="text-xl sm:text-2xl font-bold text-primary">
+                      {calculateScore(stats.implemented, stats.warnings, stats.critical)}
                     </div>
                   </dd>
                 </dl>
