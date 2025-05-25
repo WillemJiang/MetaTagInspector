@@ -19,13 +19,19 @@ export default function UrlInput({ onAnalyze, isLoading }: UrlInputProps) {
       return;
     }
 
-    if (!isValidUrl(url)) {
-      setError("Please enter a valid URL (e.g., https://example.com)");
+    // Format URL - add https:// if missing
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = 'https://' + formattedUrl;
+    }
+
+    if (!isValidUrl(formattedUrl)) {
+      setError("Please enter a valid URL (e.g., example.com)");
       return;
     }
 
     setError("");
-    onAnalyze(url);
+    onAnalyze(formattedUrl);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -48,7 +54,7 @@ export default function UrlInput({ onAnalyze, isLoading }: UrlInputProps) {
               onChange={(e) => setUrl(e.target.value)}
               onKeyDown={handleKeyDown}
               className="pl-9 sm:pl-10 pr-9 sm:pr-12 py-2 sm:py-3 text-sm sm:text-base h-10 sm:h-12"
-              placeholder="https://example.com"
+              placeholder="example.com"
             />
             {url.length > 0 && (
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -83,7 +89,7 @@ export default function UrlInput({ onAnalyze, isLoading }: UrlInputProps) {
         </Button>
       </div>
       <div className="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-        Example: https://www.example.com
+        Example: example.com (no need to type https://)
       </div>
     </div>
   );
