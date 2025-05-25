@@ -37,36 +37,36 @@ export default function MetaTagItem({ tag }: MetaTagItemProps) {
 
   return (
     <div className="border dark:border-slate-700 rounded-md overflow-hidden">
-      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700 flex justify-between items-center">
-        <div className="flex items-center">
+      <div className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <div className="flex items-center flex-wrap gap-1">
           <span
             className={cn(
-              "flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full mr-2",
+              "flex-shrink-0 inline-block px-1.5 sm:px-2 py-0.5 text-xs font-medium rounded-full mr-1 sm:mr-2 break-all",
               bgColor,
               textColor
             )}
           >
             {tag.name}
           </span>
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
             {tag.type || "meta"}
           </span>
         </div>
         <div>
           <span
             className={cn(
-              "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+              "inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium",
               bgColor,
               textColor
             )}
           >
             {icon}
-            <span className="ml-1.5">{statusText}</span>
+            <span className="ml-1 sm:ml-1.5">{statusText}</span>
           </span>
         </div>
       </div>
-      <div className="px-4 py-3 bg-white dark:bg-slate-800">
-        <div className="text-sm text-slate-900 dark:text-slate-200 whitespace-pre-wrap">
+      <div className="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-slate-800">
+        <div className="text-xs sm:text-sm text-slate-900 dark:text-slate-200 whitespace-pre-wrap break-words">
           {tag.content || "No content"}
         </div>
         {tag.recommendation && (

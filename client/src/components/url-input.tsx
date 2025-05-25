@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link, Loader2 } from "lucide-react";
+import { Link, Loader2, X } from "lucide-react";
 import { isValidUrl } from "@/lib/utils";
 
 interface UrlInputProps {
@@ -35,19 +35,19 @@ export default function UrlInput({ onAnalyze, isLoading }: UrlInputProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 mb-8">
-      <h2 className="text-lg font-semibold mb-4 dark:text-white">Enter a website URL to analyze SEO tags</h2>
-      <div className="flex flex-col md:flex-row gap-4">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
+      <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Enter a website URL to analyze SEO tags</h2>
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-grow">
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Link className="h-5 w-5 text-slate-400" />
+              <Link className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
             </div>
             <Input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="pl-10 pr-12 py-3"
+              className="pl-9 sm:pl-10 pr-9 sm:pr-12 py-2 sm:py-3 text-sm sm:text-base h-10 sm:h-12"
               placeholder="https://example.com"
             />
             {url.length > 0 && (
@@ -55,45 +55,34 @@ export default function UrlInput({ onAnalyze, isLoading }: UrlInputProps) {
                 <button
                   type="button"
                   onClick={() => setUrl("")}
-                  className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
+                  className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300 focus:outline-none"
+                  aria-label="Clear input"
                 >
-                  <span className="sr-only">Clear</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <X className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             )}
           </div>
           {error && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
         </div>
         <Button
           onClick={handleAnalyze}
           disabled={isLoading || url.trim() === ""}
-          className="py-2"
+          className="py-2 h-10 sm:h-12 px-4 text-sm sm:text-base whitespace-nowrap"
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyzing...
+              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              <span>Analyzing...</span>
             </>
           ) : (
             "Analyze"
           )}
         </Button>
       </div>
-      <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+      <div className="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
         Example: https://www.example.com
       </div>
     </div>
