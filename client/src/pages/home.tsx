@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import UrlInput from "@/components/url-input";
 import EmptyState from "@/components/empty-state";
@@ -35,13 +35,16 @@ export default function Home() {
     setUrl("");
   };
 
-  if (isError) {
-    toast({
-      title: "Error analyzing URL",
-      description: (error as Error).message || "Failed to analyze the URL. Please try again.",
-      variant: "destructive",
-    });
-  }
+  // Show error toast only when isError changes to true
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: "Error analyzing URL",
+        description: (error as Error).message || "Failed to analyze the URL. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [isError, error, toast]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
